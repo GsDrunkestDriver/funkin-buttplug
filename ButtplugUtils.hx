@@ -99,6 +99,7 @@ class ButtplugUtils
         payloadRequest.addHeader("Content-Type", "application/json");
 
 
+        openfl.Lib.application.onExit.add((code) -> stop());
         _request.request();
     }
 
@@ -280,10 +281,12 @@ class ButtplugUtils
         if (emergency == true)
             emergencyStopActive = true;
     }
+
     static function set_intensity(value:Int)
     {
         intensity = value;
         vibrateRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + '/$intensity';
         return value;
     }
+
 }
