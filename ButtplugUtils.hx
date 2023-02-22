@@ -95,6 +95,7 @@ class ButtplugUtils
         payloadRequest.addHeader("Content-Type", "application/json");
 
 
+        openfl.Lib.application.onExit.add((code) -> stop());
         _request.request();
     }
 
