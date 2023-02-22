@@ -24,7 +24,7 @@ Furthermore, ***this implementation currently DOES NOT stop vibrations on progra
 
 1. Install the dependencies. (this includes running through intiface central's in-program setup)
 
-2. Replace ToyWebBridge's start.bat with the one in this repo. (this changes the port ToyWebBridge runs on to 6969)
+2. Replace ToyWebBridge's start.bat and appsettings.json with the ones in this repo. (this changes the port ToyWebBridge runs on to 6969 and sets the secret key)
 
 3. Place ButtplugUtils.hx somewhere in your project's source folder.
 
