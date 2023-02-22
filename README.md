@@ -8,7 +8,7 @@ This implementation requires a couple programs in order to work, but it's pretty
 ## DISCLAIMER
 
 This is a very rough implementation. There's a lot of things that will go wrong, and as of now ***I wouldn't recommend using this on something you're going to shove up your ass.***
-Furthermore, ***this implementation currently DOES NOT stop vibrations on program exit***, I've yet to figure out how that works.
+
 
 
 ***
@@ -64,7 +64,5 @@ The supplied payload will loop until ToyWebBridge is informed otherwise, so it'd
 
 * It's advisable to use payloads instead of calling ButtplugUtils.vibrate() every beatHit, as the server will rely on stop commands from your mod to stop the vibration 
 which can lead to some undesirable behaviours if there's a lag spike or something.
-
-* TODO: figure out how to stop vibration on program exit
 
 * More to come, probably.
