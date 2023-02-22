@@ -26,6 +26,10 @@ class ButtplugUtils
     public static var isVibrating:Bool = false;
     public static var deviceConnected:Bool = true;
     public static var emergencyStopActive:Bool = false;
+    /**
+     * The amount of strength on the vibrations.
+     */
+    public static var intensity(default, set):Int;
 
 
     //TODO: look into setting up sequence payload based on the current song's bpm - requires a JSON encoded POST query.
@@ -49,7 +53,7 @@ class ButtplugUtils
             trace("device:" + device);
             deviceEncoded = encodeDevice(device);
             trace("deviceEncoded:" + deviceEncoded);
-            vibrateRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + "/75"; //change the 75 to your desired intensity!
+            vibrateRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + '/$intensity'; //change the 75 to your desired intensity!
             stopRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + "/0"; //don't change this!
             payloadRequest.url = "http://localhost:6969/api/Device/SequenceVibrateCmd/" + deviceEncoded;
             deviceConnected = true;
@@ -179,9 +183,13 @@ class ButtplugUtils
 
     /**
      * Sends a vibrate command to the server.
+     * @param duration the amount of milliseconds the vibration is going to prolong. 
+     * **WARNING:** The duration will be set to 50 if it's lower than that number due to frontend requirements. 
      */
-    public static function vibrate()
+    public static function vibrate(duration:Float = 75)
     {
+        if (duration < 50)
+            duration = 50;
         //send a vibrate command to the server
         //it'll vibrate the device at 25% for 0.05 seconds (i'd set it lower but the frontend doesn't go lower than 50ms)
         //then stop the device
@@ -189,7 +197,7 @@ class ButtplugUtils
         {
             isVibrating = true;
             vibrateRequest.request();
-            new FlxTimer().start(0.075, function(timer:FlxTimer) //stops the device after 0.075 seconds via a stop request
+            new FlxTimer().start(duration * 0.001, function(timer:FlxTimer) //stops the device after 0.075 seconds via a stop request
             {
                 stopRequest.request();
                 isVibrating = false;
@@ -273,4 +281,12 @@ class ButtplugUtils
         if (emergency == true)
             emergencyStopActive = true;
     }
+
+    static function set_intensity(value:Int)
+    {
+        intensity = value;
+        vibrateRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + '/$intensity';
+        return value;
+    }
+
 }
