@@ -70,4 +70,6 @@ Values under 0 will be rounded up to 0, and values over 100 will be rounded down
 * It's advisable to use payloads instead of calling ButtplugUtils.vibrate() every beatHit, as the server will rely on stop commands from your mod to stop the vibration 
 which can lead to some undesirable behaviours if there's a lag spike or something.
 
+* You can use an xbox controller to test this! It'll get picked up by Intiface Central and handles the vibration commands just fine.
+
 * More to come, probably.
