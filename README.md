@@ -58,6 +58,11 @@ Returns a JSON-encoded string that can be passed to ButtplugUtils.sendPayload().
 Sends the supplied payload to ToyWebBridge via a JSON-encoded POST request.
 The supplied payload will loop until ToyWebBridge is informed otherwise, so it'd be wise to call ButtplugUtils.stop() at the end of your song.
 
+### ButtplugUtils.setIntensity(value:Int)
+
+Sets the intensity of ButtplugUtils.vibrate() and ButtplugUtils.createPayload() to your chosen value.
+Values under 0 will be rounded up to 0, and values over 100 will be rounded down to 100 as the intensity is a percentage.
+
 ***
 
 ## Tips

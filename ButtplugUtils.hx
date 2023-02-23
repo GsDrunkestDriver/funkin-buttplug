@@ -53,7 +53,7 @@ class ButtplugUtils
             trace("device:" + device);
             deviceEncoded = encodeDevice(device);
             trace("deviceEncoded:" + deviceEncoded);
-            vibrateRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + '/$intensity'; //change the 75 to your desired intensity!
+            vibrateRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + '/$intensity';
             stopRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + "/0"; //don't change this!
             payloadRequest.url = "http://localhost:6969/api/Device/SequenceVibrateCmd/" + deviceEncoded;
             deviceConnected = true;
@@ -99,7 +99,7 @@ class ButtplugUtils
         payloadRequest.addHeader("Content-Type", "application/json");
 
 
-        openfl.Lib.application.onExit.add((code) -> stop());
+        openfl.Lib.application.onExit.add((code) -> stop()); //thanks to sayofthelor for this one!
         _request.request();
     }
 
@@ -239,7 +239,7 @@ class ButtplugUtils
             "Loop":true,
             "Time":[${crochetString}, ${crochetString}],
             "Speeds":[
-                [50, 0]
+                [${intensity}, 0]
             ]
 
         }';
@@ -282,8 +282,16 @@ class ButtplugUtils
             emergencyStopActive = true;
     }
 
-    static function set_intensity(value:Int)
+    /**
+     * Sets the intensity of the vibration called by vibrate().
+     * @param value The intensity of the vibration. Must be between 0 and 100.
+     */
+    static function setIntensity(value:Int) //thanks to Cheemsandfriends for this function!
     {
+        if (value < 0)
+            value = 0;
+        if (value > 100)
+            value = 100;
         intensity = value;
         vibrateRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + '/$intensity';
         return value;

@@ -1,0 +1,48 @@
+FUNKIN' BUTTPLUG WRITEUP
+
+This is mainly just a spot where I'll throw down my understanding on how this system works, problems with the system, all that shit.
+
+DEFINITIONS:
+
+Intiface Central handles the actual meat of the buttplug calls, translating everything to the connected and all that shit. I don't know Dart or Rust because they scare me, so that's all I really know. I'll be referring to this as the backend as it does most of the heavy lifting.
+
+ToyWebBridge is our frontend. It handles communication to the backend via websockets and all that fancy shit. It's basically our translator for the backend as we can communicate with the frontend via simple GET and POST requests. I'll be referring to it using 'the frontend' and 'ToyWebBridge' interchangably throughout the writeup, just letting you know.
+
+
+HOW IT WORKS:
+
+Here's how it should work, laid out in a neat little text flow chart:
+
+ButtplugUtils.vibrate() >>> Funkin' sends a GET request to the frontend with the desired device and vibration intensity >>> Frontend communicates that to the backend >>> Backend does it's thing >>> Vibration!
+
+In order to get this all working successfully though, there's a few things we need to set up beforehand:
+
+First, we need ToyWebBridge and Intiface Central running before we call init() from ButtplugUtils.
+
+Then, we can call init() and it sets everything up like so:
+
+We start by setting up an inital request to the frontend for a list of currently connected devices, and filter everything off until we're left with just the name of the device. We then encode the device's name to comply with URL formatting (like replacing any spaces with %20) and set all the other URLs up so that the requests point to the correct device.
+
+After that, set up the secret key headers as the frontend requires a secret key in order to pass on any commands. This is because it's possible for the frontend to be accessed over the internet if ports have been forwarded, and without a secret key someone could destroy your prostate. This isn't a concern for how I've got ButtplugUtils set up, as everything's hosted locally so as long as port 6969 isn't forwarded and nobody's got your IP you should be fine.
+
+Once that's handled, we throw in the stop() function to onExit to stop vibrations when the mod's shut down. Thanks to sayofthelor for sending a pull request for that!
+
+TIPS:
+
+These aren't included in the repo as the code would be mostly engine-dependent, but it's stuff I'd recommend you do anyways.
+
+Consider integrating an option to disable/enable the buttplug functionality, as well as another for the vibration intensity! 
+
+ISSUES:
+
+Now, let's get on to some issues that can probably screw you over down the line. Note that this is where big issues that'll require a decent amount of work live, as smaller ones are listed in the repo's Issues tab.
+
+ToyWebBridge has a minimum 50ms delay between requests. Why is this bad? If you're playing a pretty fast song, I can guarantee that there'll be times where you hit two notes in a period of time that's less than 50ms. This is why ButtplugUtils is mainly focused towards BPM-based vibrations, as it holds up decently even at 200bpm. There might be a way to lower this, but that'll involve a deep-dive into ToyWebBridge's source code which I'll get around to eventually.
+
+Currently, upon starting a song with toyWebBridge not running, the game will shit itself and run at three seconds per frame. Judging by the obscene amount of traces that the console shits out upon this happening, chances are the requests keep getting sent. Either that, or flixel freezes up as it waits for a reponse that'll never come. This could probably be fixed via checking to see if the frontend's running on startup and disabling functionality if it isn't, but that's something I'll deal with later.
+
+POTENTIAL IMPROVEMENTS:
+
+This is mostly where I'll float ideas for extended functionality. I'm pretty busy nowadays, so if there's something in here that you think that you could do, go for it! If not, I'll get around to it eventually.
+
+if no secret key is set on the frontend, it'll generate a random one on startup. try and figure out a way to grab that in init()? would help secure everything just a little bit more.
