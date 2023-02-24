@@ -1,6 +1,9 @@
 package meta;
 
+import sys.io.Process;
 import flixel.util.FlxTimer;
+
+using StringTools;
 
 class ButtplugUtils
 {
@@ -31,15 +34,32 @@ class ButtplugUtils
      */
     public static var intensity(default, set):Int;
 
+    /**
+     * If ToyWebBridge and Intiface are running, this will return true.
+     */
+     public static var depsRunning:Bool = false;
 
-    //TODO: look into setting up sequence payload based on the current song's bpm - requires a JSON encoded POST query.
-    //TODO: figure out how the fuck to send the payload to the frontend. i can send post requests, but I don't know if I can access the request body.
+     /**
+      * Controls whether or not the payload cooldown is active. If it is, payloads won't be sent.
+      */
+     public static var payloadCooldown:Bool = false;
+
+    
 
     /**
      * Sets up the GET requests and the device you'll be '''using'''. Best place to call this is in Main a little after the game's been created.
      */
     public static function initialise()
     {
+        //first check to see if everything's running
+        checkDependencies();
+
+        if (!depsRunning)
+        {
+            trace("Buttplug dependencies not running, disabling buttplugUtils.");
+            return;
+        }
+
         _request.onData = function(data:String)
         {
             device = filterDevices(data);
@@ -188,6 +208,12 @@ class ButtplugUtils
      */
     public static function vibrate(duration:Float = 75)
     {
+        if (!depsRunning) //this is probably a really shitty way of doing this but fuck you
+        {
+            trace("Buttplug dependencies not running! function: vibrate");
+            return;
+        }
+
         if (duration < 50)
             duration = 50;
         //send a vibrate command to the server
@@ -218,14 +244,21 @@ class ButtplugUtils
     /**
      * Creates a JSON encoded payload for the device to vibrate to the beat of the song.
      * @param crochet The crochet (length of a beat) of the song.
+     * @param loop Whether or not the payload should loop. Defaults to false as it's intended to be called every beatHit().
      * @return The JSON encoded payload.
      */
-    public static function createPayload(crochet:Float):String
+    public static function createPayload(crochet:Float, ?loop:Bool = false):String
     {
         //creates a payload for the device to vibrate to the beat of the song
         //essentially it grabs the current song's crochet (length of a beat) and then creates a payload based on that
         //if all goes well, it should vibrate for half a beat, then stop for half a beat. It'll loop until a request is sent to stop it.
         //it'll need to be sent to the server as a JSON encoded POST query too, which won't be fun to do when i don't know how to do that.
+
+        if (!depsRunning)
+        {
+            trace("Buttplug dependencies not running! function: createPayload");
+            return "BPDEPSNOTRUNNING";
+        }
 
         //start off by turning the crochet into an int
         var crochetInt = Std.int(crochet / 2);
@@ -236,8 +269,8 @@ class ButtplugUtils
         //now we need to build the json payload
         var jsonPayload = '
         {
-            "Loop":true,
-            "Time":[${crochetString}, ${crochetString}],
+            "Loop":${loop},
+            "Time":[${crochetString}, 5],
             "Speeds":[
                 [${intensity}, 0]
             ]
@@ -255,17 +288,28 @@ class ButtplugUtils
      */
     public static function sendPayload(payload:String)
     {
+        if (!depsRunning)
+        {
+            trace("Buttplug dependencies not running! function: sendPayload");
+            return;
+        }
+
         //sends the payload to the server via a POST query
-        if (deviceConnected == true)
+        if (deviceConnected == true && !payloadCooldown)
         {
             trace("sending payload: " + payload);
             trace("to this url: " + payloadRequest.url);
             payloadRequest.setPostData(payload); //god i hope this works
             payloadRequest.request(true); //true means it's a POST query
+            payloadCooldown = true;
+            new FlxTimer().start(0.1, function(timer:FlxTimer) //stops any payloads from being sent for 0.1 seconds, to prevent any spam from frame drops
+            {
+                payloadCooldown = false;
+            });
         }
         else
         {
-            trace("device not connected, not sending payload");
+            trace("device not connected or payload cooldown is active, not sending payload");
         }
     }
 
@@ -275,6 +319,11 @@ class ButtplugUtils
      */
     public static function stop(?emergency:Bool = false)
     {
+        if (!depsRunning)
+        {
+            trace("Buttplug dependencies not running! function: stop");
+            return;
+        }
         //sends a stop command to the server
         //it'll stop the device from vibrating
         stopRequest.request();
@@ -286,7 +335,7 @@ class ButtplugUtils
      * Sets the intensity of the vibration called by vibrate().
      * @param value The intensity of the vibration. Must be between 0 and 100.
      */
-    static function setIntensity(value:Int) //thanks to Cheemsandfriends for this function!
+    public static function set_intensity(value:Int) //thanks to Cheemsandfriends for this function!
     {
         if (value < 0)
             value = 0;
@@ -295,6 +344,34 @@ class ButtplugUtils
         intensity = value;
         vibrateRequest.url = "http://localhost:6969/api/Device/VibrateCmd/" + deviceEncoded + '/$intensity';
         return value;
+    }
+
+    static function checkDependencies()
+    {
+        //checks to see if toywebbridge and intiface central are running
+        //if they aren't, it'll let the user know and disable buttplug support
+
+        //first we need to check if toywebbridge is running
+        var toywebbridgeRunning = false;
+        var intifaceRunning = false;
+
+        var twbtask = new Process('tasklist /fi "imagename eq toywebbridge.exe" /fo csv /nh');
+        toywebbridgeRunning = StringTools.contains(twbtask.stdout.readAll().toString(), "ToyWebBridge.exe");
+
+        var intifaceTask = new Process('tasklist /fi "imagename eq intiface_central.exe" /fo csv /nh');
+        intifaceRunning = StringTools.contains(intifaceTask.stdout.readAll().toString(), "intiface_central.exe");
+
+        if (toywebbridgeRunning == false || intifaceRunning == false)
+        {
+            trace("toywebbridge or intiface central not running, disabling buttplug support");
+            depsRunning = false;
+        }
+        else
+        {
+            trace("toywebbridge and intiface central running, enabling buttplug support");
+            depsRunning = true;
+        }
+
     }
 
 }
