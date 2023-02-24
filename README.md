@@ -40,9 +40,9 @@ This is a very rough implementation. There's a lot of things that will go wrong,
 
 Initialises the buttplug client. This should be called before any other functions.
 
-### ButtplugUtils.vibrate()
+### ButtplugUtils.vibrate(duration:Float = 75)
 
-Vibrates the connected toy at 75% power for 0.75 seconds. This can be easily modified to take in different values based on your needs.
+Vibrates the connected toy at `intensity`% power for `duration`ms. This can be easily modified to take in different values based on your needs.
 
 ### ButtplugUtils.stop(?emergency:Bool = false)
 
