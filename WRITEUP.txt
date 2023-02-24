@@ -39,7 +39,7 @@ Now, let's get on to some issues that can probably screw you over down the line.
 
 ToyWebBridge has a minimum 50ms delay between requests. Why is this bad? If you're playing a pretty fast song, I can guarantee that there'll be times where you hit two notes in a period of time that's less than 50ms. This is why ButtplugUtils is mainly focused towards BPM-based vibrations, as it holds up decently even at 200bpm. There might be a way to lower this, but that'll involve a deep-dive into ToyWebBridge's source code which I'll get around to eventually.
 
-Currently, upon starting a song with toyWebBridge not running, the game will shit itself and run at three seconds per frame. Judging by the obscene amount of traces that the console shits out upon this happening, chances are the requests keep getting sent. Either that, or flixel freezes up as it waits for a reponse that'll never come. This could probably be fixed via checking to see if the frontend's running on startup and disabling functionality if it isn't, but that's something I'll deal with later.
+Currently, upon starting a song with toyWebBridge not running, the game will shit itself and run at three seconds per frame. Judging by the obscene amount of traces that the console shits out upon this happening, chances are the requests keep getting sent. Either that, or flixel freezes up as it waits for a reponse that'll never come. This could probably be fixed via checking to see if the frontend's running on startup and disabling functionality if it isn't, but that's something I'll deal with later. << Fixed as of commit 1f1aa7f 'timing fix + idiot proofing'. 
 
 POTENTIAL IMPROVEMENTS:
 
