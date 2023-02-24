@@ -40,23 +40,25 @@ This is a very rough implementation. There's a lot of things that will go wrong,
 
 Initialises the buttplug client. This should be called before any other functions.
 
-### ButtplugUtils.vibrate()
+### ButtplugUtils.vibrate(duration:Float = 75)
 
-Vibrates the connected toy at 75% power for 0.75 seconds. This can be easily modified to take in different values based on your needs.
+Vibrates the connected toy at `intensity`% power for `duration`ms. This can be easily modified to take in different values based on your needs.
 
 ### ButtplugUtils.stop(?emergency:Bool = false)
 
 Stops the connected toy. If emergency is true, the toy will stop and vibration will be disabled until the next time the program starts up.
 
-### ButtplugUtils.createPayload(crochet:Float)
+### ButtplugUtils.createPayload(crochet:Float, ?loop:Bool = false)
 
 Generates a vibration pattern payload based on the supplied crochet value to vibrate on beat.
+Due to the way the frontend handles payloads, it's advisable to generate a non-looping payload and call ButtplugUtils.sendPayload() every beatHit().
 Returns a JSON-encoded string that can be passed to ButtplugUtils.sendPayload().
 
 ### ButtplugUtils.sendPayload(payload:String)
 
 Sends the supplied payload to ToyWebBridge via a JSON-encoded POST request.
-The supplied payload will loop until ToyWebBridge is informed otherwise, so it'd be wise to call ButtplugUtils.stop() at the end of your song.
+If your payload doesn't loop, you'll need to call this every beatHit().
+If your payload loops, don't forget to call ButtplugUtils.stop() at the end of the song!
 
 ### ButtplugUtils.set_intensity(value:Int)
 
