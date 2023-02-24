@@ -58,10 +58,15 @@ Returns a JSON-encoded string that can be passed to ButtplugUtils.sendPayload().
 Sends the supplied payload to ToyWebBridge via a JSON-encoded POST request.
 The supplied payload will loop until ToyWebBridge is informed otherwise, so it'd be wise to call ButtplugUtils.stop() at the end of your song.
 
-### ButtplugUtils.setIntensity(value:Int)
+### ButtplugUtils.set_intensity(value:Int)
 
 Sets the intensity of ButtplugUtils.vibrate() and ButtplugUtils.createPayload() to your chosen value.
 Values under 0 will be rounded up to 0, and values over 100 will be rounded down to 100 as the intensity is a percentage.
+
+### ButtplugUtils.checkDependencies()
+
+Checks if ToyWebBridge and Intiface Central are running. Returns true if both are running, false if either is not.
+If this returns false, most functions will be disabled. This isn't meant to be called by the user, but it's there if you want to use it for whatever reason.
 
 ***
 
