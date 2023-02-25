@@ -357,9 +357,11 @@ class ButtplugUtils
 
         var twbtask = new Process('tasklist /fi "imagename eq toywebbridge.exe" /fo csv /nh');
         toywebbridgeRunning = StringTools.contains(twbtask.stdout.readAll().toString(), "ToyWebBridge.exe");
+        twbtask.close();
 
         var intifaceTask = new Process('tasklist /fi "imagename eq intiface_central.exe" /fo csv /nh');
         intifaceRunning = StringTools.contains(intifaceTask.stdout.readAll().toString(), "intiface_central.exe");
+        intifaceTask.close();
 
         if (toywebbridgeRunning == false || intifaceRunning == false)
         {
