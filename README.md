@@ -3,6 +3,8 @@
 This repo contains the funkin-side source code for implementing beat-based buttplug support.
 This implementation requires a couple programs in order to work, but it's pretty easy to set up.
 
+Check out an example of the implementation [here!](https://github.com/GsDrunkestDriver/funkin-buttplug-example-repo)
+
 ***
 
 ## DISCLAIMER
