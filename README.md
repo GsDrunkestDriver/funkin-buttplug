@@ -11,7 +11,7 @@ Check out an example of the implementation [here!](https://github.com/GsDrunkest
 
 This is a very rough implementation. There's a lot of things that will go wrong, and as of now ***I wouldn't recommend using this on something you're going to shove up your ass.***
 
-
+A decently large change to the source code is planned too so don't get comfy with the codebase in its current state. See [this issue](https://github.com/GsDrunkestDriver/funkin-buttplug/issues/7) for more info.
 
 ***
 
